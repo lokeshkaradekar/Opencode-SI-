@@ -1,0 +1,13 @@
+{
+  "name": "opencode-si",
+  "version": "0.4.2",
+  "private": true,
+  "description": "OpenCode SI - Android WebView UI + Java bridge + Termux daemon. No runtime dependencies.",
+  "scripts": {
+    "test": "npm run test:daemon && npm run test:frontend && npm run test:java",
+    "test:daemon": "python3 -m unittest daemon.tests.test_daemon daemon.tests.test_extended",
+    "test:frontend": "node --test tests/frontend/bridge.test.js tests/frontend/terminal.test.js tests/frontend/opencode.test.js tests/frontend/agent.test.js tests/frontend/agent-thinking-indicator-regression.test.js tests/frontend/ui-files-layout.test.js tests/frontend/ui-polish-v29.test.js tests/frontend/ui-reply-theme-v31.test.js tests/frontend/auto-repair.test.js tests/frontend/setup-persistence-v33.test.js tests/frontend/storage-setup-v36.test.js tests/frontend/package-repair-v37.test.js tests/frontend/setup-bundle-transfer-v39.test.js tests/frontend/termux-opencode-release-v40.test.js tests/frontend/manual-setup-alternative-v42.test.js",
+    "test:java": "bash tests/java/run.sh",
+    "build": "node tools/check-assets.js"
+  }
+}

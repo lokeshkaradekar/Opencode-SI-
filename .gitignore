@@ -1,0 +1,22 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Node / Python generated files
+node_modules/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+
+# Local secrets and generated builds
+.env
+.env.*
+!.env.example
+*.apk
+*.aab
+build/
+dist/
+*.log

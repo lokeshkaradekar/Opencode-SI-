@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en" style="background:#0a0a14">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="color-scheme" content="light dark">
+<title>OpenCode SI</title>
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/components.css">
+</head>
+<body style="background:#0a0a14;color:#fff">
+<div id="app">
+  <header id="topbar"></header>
+  <main id="screen"></main>
+  <nav id="tabbar" aria-label="Project sections"></nav>
+</div>
+<div id="layer"></div>
+
+<!-- Order matters: no ES modules, so the app loads from file:///android_asset -->
+<script src="js/ui.js"></script>
+<script src="js/state.js"></script>
+<script src="js/errors.js"></script>
+<script src="js/diff.js"></script>
+<script src="js/bridge.js"></script>
+<script src="js/providers.js"></script>
+<script src="js/opencode.js"></script>
+<script src="js/health.js"></script>
+<script src="js/agent.js"></script>
+<script src="js/git.js"></script>
+<script src="js/editor.js"></script>
+<script src="js/files.js"></script>
+<script src="js/terminal.js"></script>
+<script src="js/router.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
