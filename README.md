@@ -1,4 +1,4 @@
-<div align="center">
+Installationlationlationlign="center">
 
 <img src="assets/branding/opencode-banner.png" alt="OpenCode SI logo" width="235">
 
@@ -128,16 +128,7 @@ The APK does not itself imply that a complete Linux shell or the OpenCode runtim
 
 Compatibility has not been systematically validated across devices and Android versions. See [Android Support](docs/ANDROID_SUPPORT.md).
 
-## Installation
 
-For the documented setup route:
-
-1. Read the [Installation Guide](docs/INSTALLATION.md).
-2. Follow the [Sketchware Pro setup notes](docs/SKETCHWARE_SETUP.md) if importing/building from source.
-3. Install and open Termux, then follow the app's setup checks.
-4. Use **Check again** and confirm the required health checks pass before relying on the agent.
-
-If setup fails, see [Troubleshooting](docs/REPAIR_NOTES.md).
 
 ## Development checks
 
