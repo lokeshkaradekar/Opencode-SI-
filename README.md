@@ -32,6 +32,7 @@ This repository includes an APK file named **`Opencode Si.apk`**, along with the
 ## Download Android APK
 
 <div align="center">
+<img src="assets/branding/opencode-logo.png" alt="OpenCode SI logo" width="112">
 
 ### OpenCode SI — Android APK
 
