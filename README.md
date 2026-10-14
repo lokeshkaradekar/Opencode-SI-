@@ -1,4 +1,4 @@
-Installationlationlationlign="center">
+<div align="center">
 
 <img src="assets/branding/opencode-banner.png" alt="OpenCode SI logo" width="235">
 
