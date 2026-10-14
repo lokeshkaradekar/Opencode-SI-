@@ -13,6 +13,7 @@
   <img alt="APK included" src="https://img.shields.io/badge/ANDROID-APK%20INCLUDED-1976D2?style=for-the-badge&logo=android&logoColor=white">
   <img alt="Source version 0.4.2" src="https://img.shields.io/badge/SOURCE_VERSION-0.4.2-7C4DFF?style=for-the-badge">
   <img alt="Project status prototype" src="https://img.shields.io/badge/STATUS-PROTOTYPE-FF9800?style=for-the-badge">
+  <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/LICENSE-SEE%20LICENSE%20FILE-607D8B?style=for-the-badge"></a>
 </p>
 
 [Download APK](#download-android-apk) · [Features](#features) · [Screenshots](#screenshots) · [Installation](docs/INSTALLATION.md) · [Troubleshooting](docs/REPAIR_NOTES.md)
@@ -60,7 +61,7 @@ Only install APKs from sources you trust. Review Android's installation and perm
 | Source package version | `0.4.2` (`package.json`; not verified as the APK version) |
 | Android build workflow | Sketchware Pro source import is documented |
 | Device validation | Not certified across Android devices |
-| License | No project license selected yet |
+| License | See [`LICENSE`](LICENSE) for the applicable terms |
 
 ## Features
 
@@ -161,4 +162,4 @@ OpenCode SI is an independent project and is not developed by, endorsed by, or a
 
 ## License
 
-A project license has not yet been selected in this repository. Until a license is added, do not assume the source is licensed for unrestricted reuse or redistribution.
+This project includes a [`LICENSE`](LICENSE) file. Read that file for the exact permissions, conditions, and limitations that apply to using, modifying, and redistributing this project. Do not assume that third-party dependencies, upstream OpenCode components, or other bundled materials are covered by this project license; their respective licenses may apply.
