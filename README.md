@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/branding/opencode-banner.png" alt="OpenCode SI logo" width="112">
+<img src="assets/branding/opencode-banner.png" alt="OpenCode SI logo" width="235">
 
 # OpenCode SI
 
