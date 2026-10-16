@@ -61,11 +61,17 @@
 .err-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
 
 /* ---------- SI (agent chat) screen ---------- */
-.chat { display: flex; flex-direction: column; min-height: 0; min-width: 0; width: 100%; max-width: 100%; overflow: hidden; background: var(--bg); }
-.chat-head { display: flex; gap: 8px; padding: 12px; border-bottom: 1px solid var(--line); background: var(--bg); flex-wrap: wrap; align-items: center; }
-.chat-banner { display: flex; flex: none; flex-direction: column; gap: 8px; min-height: 0; padding: 0 0 8px; }
+.chat { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; min-width: 0; width: 100%; max-width: 100%; overflow: hidden; background: var(--bg); }
+/* Keep the control area compact so the transcript, not the toolbar, gets the screen height. */
+.chat-head { display: flex; flex: none; gap: 6px; padding: 7px 10px; border-bottom: 1px solid var(--line); background: var(--bg); flex-wrap: wrap; align-items: center; }
+.chat-head > .chip { min-height: 34px; padding-top: 5px; padding-bottom: 5px; font-size: 12px; }
+.chat-head .restart-chat-btn { width: 36px; height: 36px; min-height: 36px; padding: 0; margin-left: auto; }
+.chat-head .mode-ctl { min-height: 36px; margin-left: auto; }
+.chat-head .mode-ctl .seg-opt { min-height: 32px; padding: 0 13px; }
+.mode-note { flex: none; padding: 0 10px 6px; font-size: 12px; }
+.chat-banner { display: flex; flex: 0 1 auto; flex-direction: column; gap: 8px; min-height: 0; max-height: 22dvh; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; padding: 0 0 6px; }
 .chat-banner:empty { display: none; }
-.resume { box-sizing: border-box; flex: none; min-width: 0; margin: 8px 12px 0; padding: 14px; border: 1px solid var(--warn); border-radius: var(--radius-lg); background: var(--panel); box-shadow: var(--card-shadow); overflow-wrap: anywhere; }
+.resume { box-sizing: border-box; flex: none; min-width: 0; max-height: 32dvh; margin: 8px 12px 0; padding: 14px; border: 1px solid var(--warn); border-radius: var(--radius-lg); background: var(--panel); box-shadow: var(--card-shadow); overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; overflow-wrap: anywhere; }
 .ckpt { list-style: none; padding: 0; margin: 8px 0; font-family: var(--mono); font-size: 12px; color: var(--muted); }
 .ckpt .done { color: var(--ok); }
 .ckpt .next { color: var(--warn); font-weight: 700; }
@@ -128,21 +134,24 @@
 .outcome-label { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .02em; }
 .outcome-section .plain { display: grid; gap: 4px; min-width: 0; max-width: 100%; padding-left: 20px; margin: 0; font-size: 14px; color: var(--ink); overflow-wrap: anywhere; word-break: break-word; }
 .outcome-section .plain code { font-size: 12px; color: var(--muted); white-space: normal; overflow-wrap: anywhere; word-break: break-all; }
-.chat-dock { flex: none !important; padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); background: var(--bg); border-top: 1px solid var(--line); }
+.chat-dock { flex: none !important; min-width: 0; padding: 7px 10px calc(7px + env(safe-area-inset-bottom)); background: var(--bg); border-top: 1px solid var(--line); }
 /* Persistent live-task area: keep Thinking/tool activity visible above the composer,
    independent of transcript length, viewport height, or Android display scaling. */
-.active-activity-dock { flex: none; min-width: 0; padding: 0 0 8px; }
+.active-activity-dock { flex: none; min-width: 0; padding: 0 0 6px; }
 .active-activity-dock:empty { display: none; }
 .active-activity-dock .activity-card { width: 100%; max-width: 100%; box-sizing: border-box; }
-.active-activity-dock .activity-body { max-height: 18vh; overflow-y: auto; overscroll-behavior: contain; }
+.active-activity-dock .activity-head { min-height: 40px; }
+.outcome-card { flex: none; }
+.active-activity-dock .activity-body { box-sizing: border-box; max-height: min(24dvh, 220px); overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+.activity-notice { padding: 9px 10px; border: 1px solid var(--warn); border-radius: 9px; color: var(--ink); background: var(--panel-2); font-size: 12px; line-height: 1.45; overflow-wrap: anywhere; }
 
 .composer { display: flex; gap: 10px; align-items: flex-end; }
 .chat-input {
-  flex: 1; min-height: 48px; max-height: 120px; resize: none; padding: 13px 16px; line-height: 1.35; font-size: 14px;
+  flex: 1; min-width: 0; min-height: 44px; max-height: 112px; resize: none; padding: 13px 16px; line-height: 1.35; font-size: 14px;
   border-radius: var(--radius-lg); border: 1px solid var(--line); background: var(--panel);
 }
 .chat-dock .btn.primary.icon-btn {
-  width: 48px; height: 48px; min-height: 48px; border-radius: var(--radius-sm); flex: none; padding: 0;
+  width: 44px; height: 44px; min-height: 44px; border-radius: var(--radius-sm); flex: none; padding: 0;
 }
 .prov-list { display: grid; gap: 8px; }
 .prov-row { display: flex; align-items: center; gap: 10px; padding: 12px; text-align: left; border-radius: var(--radius-sm); border: 1px solid var(--line); background: var(--panel); }
@@ -658,3 +667,28 @@
   outline-offset: 2px;
 }
 .setup-command-row .btn { min-height: 42px; padding: 0 12px; border-radius: 10px; }
+
+
+/* OpenCode SI adaptive chat: compact controls, full-height transcript, and safe result visibility. */
+.chat-list { scrollbar-gutter: stable; padding-bottom: 18px; }
+.chat-list > .outcome-card,
+.chat-list > .err-card,
+.chat-list > .resume { flex-shrink: 0; scroll-margin-block: 12px; }
+.chat-list .outcome-card { overflow: visible; overflow-wrap: anywhere; }
+.chat-list .outcome-section,
+.chat-list .outcome-title { min-width: 0; }
+.chat-list .outcome-title { flex-wrap: wrap; }
+.chat-list .outcome-status { margin-left: auto; }
+@media (max-height: 720px) {
+  .chat-head { gap: 5px; padding: 5px 8px; }
+  .chat-head > .chip { min-height: 31px; }
+  .chat-banner { max-height: 18dvh; }
+  .chat-list { gap: 10px; padding: 8px 10px 16px; }
+  .chat-dock { padding-top: 5px; }
+  .active-activity-dock .activity-head { min-height: 36px; }
+}
+@media (max-width: 380px) {
+  .chat-head { gap: 4px; }
+  .chat-head > .chip { font-size: 11px; padding-left: 9px; padding-right: 9px; }
+  .chat-head .mode-ctl .seg-opt { padding: 0 10px; }
+}

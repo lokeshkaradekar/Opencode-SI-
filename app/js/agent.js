@@ -13,9 +13,36 @@
 (function (g) {
   'use strict';
   var h = UI.h;
-  // Never leave the chat in an endless 'Thinking' state if the server accepts a task but stops progressing.
-  // Five minutes is a UI safety bound; the native server request has its own slightly longer read timeout.
+  // A task may legitimately continue while Android has the screen off. Count only time
+  // during which the app is foregrounded; background/suspended time must not trigger a
+  // false stall cancellation when WebView timers resume. This remains a foreground safety bound.
   var TASK_STALL_TIMEOUT_MS = 5 * 60 * 1000;
+  var appInBackground = false;
+
+  function setBackgroundState(background) {
+    background = !!background;
+    if (background === appInBackground) return;
+    appInBackground = background;
+    var now = Date.now();
+    var agent = g.Agent;
+    var rec = agent && agent.activeActivity;
+    if (!rec) return;
+    if (background) {
+      if (!rec.backgroundSince) rec.backgroundSince = now;
+    } else if (rec.backgroundSince) {
+      rec.backgroundMs = (rec.backgroundMs || 0) + Math.max(0, now - rec.backgroundSince);
+      rec.backgroundSince = 0;
+    }
+  }
+
+  function foregroundTaskElapsed(rec, now) {
+    if (!rec) return 0;
+    now = now || Date.now();
+    var start = rec.startedAt || rec.ts || now;
+    var backgroundMs = rec.backgroundMs || 0;
+    if (rec.backgroundSince) backgroundMs += Math.max(0, now - rec.backgroundSince);
+    return Math.max(0, now - start - backgroundMs);
+  }
 
   /* ---------- interface ---------- */
   function AgentInterface() {}
@@ -48,6 +75,26 @@
   var P = OpenCodeAdapter.prototype;
 
   P.k = function (name) { return name + ':' + this.key; };
+
+  P.setBackgroundState = function (background) { setBackgroundState(background); };
+
+  // Reconcile on foreground: wake an existing poll loop, or create one if WebView timers
+  // were suspended and the loop disappeared. Never start two pollers for the same task.
+  P.onForeground = function () {
+    if (!this.session || !this.session.id || this.status !== 'working') return Promise.resolve();
+    var rec = this.activeActivity;
+    if (!rec) {
+      for (var i = this.history.length - 1; i >= 0; i--) {
+        if (this.history[i] && this.history[i].role === 'activity') { rec = this.history[i]; break; }
+      }
+    }
+    if (this.activePollPromise && this.activePollRun === this.runId) {
+      this.pollNudged = true;
+      return this.activePollPromise;
+    }
+    if (rec) return this.poll(rec, this.taskId || ++this.taskId);
+    return Promise.resolve();
+  };
 
   /* Switch to a project: restores its chat, checkpoint and pending proposal. */
   P.load = function (projectId) {
@@ -138,6 +185,8 @@
 
   P.push = function (msg) { msg.ts = Date.now(); this.history.push(msg); this.save(); };
   P.getStatus = function () { return this.status; };
+  // Called by the native Activity lifecycle and document visibility events.
+  P.setBackgroundState = setBackgroundState;
   P.getHistory = function () { return this.history; };
   P.getTools = function () { return ['read', 'search', 'write', 'run']; };
 
@@ -201,7 +250,7 @@
        'done' | 'failed' | 'cancelled' | 'uncertain' - the session's own terminal state */
   function newActivity() {
     var now = Date.now();
-    return { role: 'activity', ts: now, startedAt: now, phase: 'thinking', steps: [], expanded: false, error: null };
+    return { role: 'activity', ts: now, startedAt: now, backgroundMs: 0, backgroundSince: appInBackground ? now : 0, phase: 'thinking', steps: [], expanded: false, error: null };
   }
 
   /* Recover the visible live card from adapter state before drawing. The transcript array is mutable and
@@ -308,15 +357,14 @@
       return Bridge.agentStatus(s.id, 0).then(function (st) {
         fails = 0;
         if (self.runId !== run) return;
-        // OpenCode can leave a request pending when a provider stream/socket stalls. Keep polling the real
-        // task state, but never leave the UI's stop button and 'Thinking' state hanging forever. Ask the
-        // server to abort, then surface a visible actionable failure rather than inventing a reply/success.
-        var startedAt = rec && (rec.startedAt || rec.ts) ? (rec.startedAt || rec.ts) : Date.now();
-        if (st.state === 'RUNNING' && Date.now() - startedAt >= TASK_STALL_TIMEOUT_MS) {
-          var timeoutError = new Error('No final response arrived after 5 minutes. A stop request was sent. Check Health → OpenCode diagnostics for provider/model or connection errors, then retry.');
-          timeoutError.code = 'TASK_STALLED';
-          try { Promise.resolve(Bridge.agentCancel(s.id)).catch(function () {}); } catch (ignoreCancel) {}
-          throw timeoutError;
+        // A RUNNING status is authoritative: do not cancel a legitimate server task solely because
+        // a wall-clock/foreground timer expired. Some providers legitimately take several minutes.
+        // Keep polling and preserve the manual Stop action. Actual status API failures are handled below.
+        var activeElapsed = foregroundTaskElapsed(rec, Date.now());
+        if (st.state === 'RUNNING' && activeElapsed >= TASK_STALL_TIMEOUT_MS && rec && !rec.longRunningNotice) {
+          rec.longRunningNotice = true;
+          rec.notice = 'This task is taking longer than expected. It is still running on OpenCode; you can keep waiting or press Stop to cancel it.';
+          Bus.emit('agent');
         }
         self.activity = st.steps.map(mapStep);
         if (rec) { rec.steps = self.activity; rec.phase = self.activity.length ? 'acting' : 'thinking'; self.activeActivity = rec; }
@@ -641,7 +689,7 @@
       head.appendChild(h('button', { class: 'chip chip-btn', 'aria-label': 'Model', onclick: OpenCode.modelSheet }, 'Model \u00b7 ' + OpenCode.modelLabel()));
       var chatBusy = Agent.status === 'working' || !!(Agent.session && Agent.session.status === 'running');
       head.appendChild(h('button', {
-        class: 'btn small ghost restart-chat-btn',
+        class: 'icon-btn flat restart-chat-btn',
         'aria-label': 'Restart chat',
         title: chatBusy ? 'Finish or stop the current task before restarting the chat' : 'Start a fresh chat without deleting project files',
         disabled: chatBusy,
@@ -651,7 +699,7 @@
             Agent.restartChat().catch(function (e) { UI.toast(e && e.message ? e.message : 'Could not restart chat', 'bad'); });
           });
         }
-      }, UI.icon('refresh', 16), ' Restart chat'));
+      }, UI.icon('refresh', 18)));
       head.appendChild(h('div', { class: 'seg-ctl mode-ctl', role: 'group', 'aria-label': 'Agent mode for the next message' },
         [['build', 'Build'], ['plan', 'Plan']].map(function (o) {
           return h('button', {
@@ -730,6 +778,7 @@
             h('span', null, STEP_VERB[st.tool] + ' ' + st.arg)
           ));
         });
+        if (rec.notice) body.appendChild(h('div', { class: 'activity-notice', role: 'status' }, rec.notice));
         if (rec.phase === 'failed' && rec.error) body.appendChild(h('div', { class: 'activity-row failed' }, h('span', { class: 'activity-row-dot' }, '\u2717'), h('span', null, rec.error)));
         card.appendChild(body);
       }

@@ -507,12 +507,23 @@
   /* ---------- Android lifecycle (called from MainActivity.java) ---------- */
   g.onAndroidBack = function () { return Router.back(); };
   g.onAndroidLifecycle = function (ev) {
-    if (ev === 'pause') Editor.flush();
-    if (ev === 'resume') OpenCode.onResume();
+    if (ev === 'pause') { Editor.flush(); if (Agent && Agent.setBackgroundState) Agent.setBackgroundState(true); }
+    if (ev === 'resume') {
+      if (Agent && Agent.setBackgroundState) Agent.setBackgroundState(false);
+      OpenCode.onResume();
+      // Give the native bridge a moment to reconnect, then reconcile the actual server task state.
+      if (Agent && Agent.onForeground) setTimeout(function () { Agent.onForeground(); }, 350);
+    }
     if (ev === 'resume' && State.screen === 'project') Health.run({ silent: true });
   };
   window.addEventListener('pagehide', function () { Editor.flush(); });
-  document.addEventListener('visibilitychange', function () { if (document.hidden) Editor.flush(); });
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) { Editor.flush(); if (Agent && Agent.setBackgroundState) Agent.setBackgroundState(true); }
+    else {
+      if (Agent && Agent.setBackgroundState) Agent.setBackgroundState(false);
+      if (Agent && Agent.onForeground && State.screen === 'project') setTimeout(function () { Agent.onForeground(); }, 350);
+    }
+  });
 
   // The agent, Git and editor all react to file changes made elsewhere.
   Bus.on('files', function () { Editor.refresh(); });

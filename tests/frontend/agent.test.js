@@ -215,14 +215,15 @@ test('a stale/out-of-order status response is ignored once a newer task has star
 });
 
 
-test('stalled RUNNING task is cancelled and exits Thinking after the watchdog deadline', async () => {
+test('long-running RUNNING task is not auto-cancelled at the watchdog deadline and can later complete', async () => {
   let resolveStatus = null;
   let cancelCalls = 0;
+  let statusCalls = 0;
   const ctx = setup({
     agentStart: () => Promise.resolve({ sessionId: 's1' }),
     agentSend: () => Promise.resolve({}),
     agentCancel: () => { cancelCalls++; return Promise.resolve({ cancelRequested: true }); },
-    agentStatus: () => new Promise((r) => { resolveStatus = r; }),
+    agentStatus: () => new Promise((r) => { statusCalls++; resolveStatus = r; }),
   });
   load(ctx, ['app/js/agent.js']);
   ctx.Agent.load('p1');
@@ -230,12 +231,16 @@ test('stalled RUNNING task is cancelled and exits Thinking after the watchdog de
   await until(() => resolveStatus !== null);
   const rec = activityRecords(ctx)[0];
   rec.startedAt = Date.now() - (5 * 60 * 1000 + 1000);
-  resolveStatus({ state: 'RUNNING', steps: [], changes: [], summary: [], reply: '', error: null, snapshot: null });
+  const firstResolver = resolveStatus;
+  firstResolver({ state: 'RUNNING', steps: [], changes: [], summary: [], reply: '', error: null, snapshot: null });
+  await until(() => statusCalls >= 2);
+  assert.strictEqual(cancelCalls, 0, 'watchdog must not cancel a server task solely because it is long-running');
+  assert.strictEqual(ctx.Agent.status, 'working', 'long-running task remains recoverable and stoppable');
+  assert.ok(rec.notice && /taking longer than expected/.test(rec.notice), 'activity exposes a non-destructive long-running notice');
+  resolveStatus({ state: 'SUCCESS', steps: [], changes: [], summary: [], reply: 'done', error: null, snapshot: null });
   await p;
-  assert.strictEqual(cancelCalls, 1, 'watchdog requests server cancellation once');
-  assert.strictEqual(ctx.Agent.status, 'error', 'UI leaves working state');
-  assert.strictEqual(rec.phase, 'failed', 'activity no longer remains Thinking');
-  assert.ok(ctx.Agent.history.some((m) => m.role === 'error' && /5 minutes/.test(m.err.simple || m.err.message || '')), 'visible timeout error explains next diagnostic step');
+  assert.strictEqual(ctx.Agent.status, 'idle', 'real server completion resolves the task');
+  assert.strictEqual(rec.phase, 'done', 'activity reflects the real completion state');
 });
 
 test('missing/empty progress info never invents a step: steps stays empty, phase stays "thinking"', async () => {
