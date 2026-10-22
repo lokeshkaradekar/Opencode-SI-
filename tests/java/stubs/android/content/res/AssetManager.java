@@ -1,1 +1,0 @@
-package android.content.res; import java.io.InputStream; import java.io.ByteArrayInputStream; import java.io.IOException; public class AssetManager { public InputStream open(String n) throws IOException { return new ByteArrayInputStream(new byte[0]); } }

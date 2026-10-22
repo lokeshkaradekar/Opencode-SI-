@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en" style="background:#0a0a14">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="color-scheme" content="light dark">
+<title>OpenCode SI</title>
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/components.css">
+</head>
+<body style="background:#0a0a14;color:#fff">
+<div id="app">
+  <header id="topbar"></header>
+  <main id="screen"></main>
+  <nav id="tabbar" aria-label="Project sections"></nav>
+</div>
+<div id="layer"></div>
+
+<!-- Startup failsafe: never leave users staring at an empty WebView if a local script crashes. -->
+<script>
+(function () {
+  var lastError = '';
+  window.addEventListener('error', function (e) {
+    lastError = (e && (e.message || (e.filename + ':' + e.lineno))) || 'Unknown JavaScript error';
+    window.__OPENCODE_SI_STARTUP_ERROR = lastError;
+  });
+  window.addEventListener('unhandledrejection', function (e) {
+    var r = e && e.reason;
+    lastError = 'Unhandled promise: ' + (r && (r.message || String(r)) || 'unknown rejection');
+    window.__OPENCODE_SI_STARTUP_ERROR = lastError;
+  });
+  window.setTimeout(function () {
+    if (window.__OPENCODE_SI_UI_READY === true) return;
+    var top = document.getElementById('topbar');
+    var screen = document.getElementById('screen');
+    var tabs = document.getElementById('tabbar');
+    if (!top || !screen) return;
+    top.innerHTML = '';
+    screen.className = 'scroll';
+    screen.innerHTML = '<section style="margin:24px 16px;padding:22px;border:1px solid #554b78;border-radius:18px;background:#12111f;color:#f5f2ff;font:16px/1.5 system-ui,sans-serif">' +
+      '<h2 style="margin:0 0 10px;font-size:22px">OpenCode SI could not start</h2>' +
+      '<p style="color:#b8b5c9">The app page opened, but its interface did not finish initializing. Your project files have not been changed by this recovery screen.</p>' +
+      (lastError ? '<p style="padding:12px;background:#090812;border-radius:10px;overflow-wrap:anywhere;font:13px/1.5 monospace">' + lastError.replace(/[&<>\"]/g, function (c) { return ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]); }) + '</p>' : '<p style="color:#a5a0b9">No JavaScript error was captured. Try reloading the app.</p>') +
+      '<button onclick="location.reload()" style="margin-top:10px;border:0;border-radius:12px;padding:14px 20px;background:#6865ed;color:white;font-weight:700;font-size:16px">Reload OpenCode SI</button></section>';
+    if (tabs) tabs.hidden = true;
+    document.getElementById('app').classList.add('no-tabs');
+  }, 3500);
+})();
+</script>
+
+<!-- Order matters: no ES modules, so the app loads from file:///android_asset -->
+<script src="js/ui.js"></script>
+<script src="js/state.js"></script>
+<script src="js/errors.js"></script>
+<script src="js/diff.js"></script>
+<script src="js/bridge.js"></script>
+<script src="js/providers.js"></script>
+<script src="js/opencode.js"></script>
+<script src="js/health.js"></script>
+<script src="js/reply-renderer.js"></script>
+<script src="js/agent.js"></script>
+<script src="js/git.js"></script>
+<script src="js/editor.js"></script>
+<script src="js/files.js"></script>
+<script src="js/terminal.js"></script>
+<script src="js/router.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
