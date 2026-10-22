@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="assets/branding/opencode-banner.png" alt="OpenCode SI logo" width="235">
+
 # OpenCode SI
 
 ### AI-assisted coding on Android
@@ -11,6 +13,34 @@
 ![Status](https://img.shields.io/badge/Status-Prototype-orange?style=for-the-badge)
 
 </div>
+
+## About
+
+**OpenCode SI is an Android app project** that provides a mobile interface for an AI coding agent. Its interface is built with a WebView and native Java bridge. Termux supplies the local command-line environment and runs the supporting services.
+
+This repository includes an APK file named **`Opencode Si.apk`**, along with the app source and documentation. The APK is present in the repository, but its build provenance, internal version, and successful installation on a physical Android device have **not** been independently verified here. The source package version shown above is from `package.json`; it must not be assumed to be the APK's version.
+
+> **Project status: Prototype.** Automated tests cover portions of the frontend, daemon, and Java logic. Full Android/Sketchware integration and real-device workflows still require validation. See [Implementation Status](docs/STATUS.md).
+
+## Download Android APK
+
+<div align="center">
+<img src="assets/branding/opencode-logo.png" alt="OpenCode SI logo" width="112">
+
+### OpenCode SI — Android APK
+
+**Package file:** `Opencode Si.apk`  
+**Repository file size:** approximately 768 KB  
+**Distribution:** APK file included in this Git repository
+
+[**↓ Download Opencode Si.apk**](Opencode%20Si.apk)
+
+</div>
+
+The APK is a repository download, not a Google Play Store release. Android compatibility and the APK's internal version have not been certified. If installation is blocked, review the [installation guide](docs/INSTALLATION.md) and [Android support notes](docs/ANDROID_SUPPORT.md).
+
+Only install APKs from sources you trust. Review Android's installation and permission prompts before proceeding.
+
 
 ---
 
