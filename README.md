@@ -16,7 +16,7 @@
   <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/LICENSE-SEE%20LICENSE%20FILE-607D8B?style=for-the-badge"></a>
 </p>
 
-[Download APK](#download-android-apk) · [Features](#features) · [Screenshots](#screenshots) · [Installation](docs/INSTALLATION.md) · [Troubleshooting](docs/REPAIR_NOTES.md)
+[Download APK](#download-android-apk) · [Features](#features) · [Screenshots](#screenshots) · [Installation](docs/INSTALLATION.md) · [Sketchware Setup](docs/SKETCHWARE_SETUP.md) · [Project Status](docs/STATUS.md) · [Troubleshooting](docs/REPAIR_NOTES.md)
 
 </div>
 
